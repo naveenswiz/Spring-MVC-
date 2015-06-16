@@ -1,0 +1,63 @@
+<project default="make-war-file" basedir=".">
+		
+	<property name="project.name" value="SpringMVCExampleANT"/>
+    <property name="war.filename" value="${project.name}.war"/>
+	
+    <property name="src.dir" value="src"/>
+	<property name="lib.dir" value="WebContent/WEB-INF/lib"/>
+	<property name="war-content.dir" value="WebContent"/>
+	
+	 <property name="build.dir" value="build"/>
+     <property name="ant-temp.dir" value="build/ant-temp"/>
+	 <property name="class.dir" value="${ant-temp.dir}/classes"/>
+
+	 <property name="tomcat.home" location="C:\Naveen\Tomcat\apache-tomcat-7.0.42" />
+	 <property name="tomcat.lib" location="${tomcat.home}/lib" />
+	
+	 <path id="project.classpath">
+		    <fileset dir="${lib.dir}">
+		      <include name="**/*.jar"/>
+		    </fileset>
+			<fileset dir="${tomcat.lib}">
+				<include name="**/*.jar"/>
+			</fileset>
+	 </path>	 	
+  
+	<target name="clean">
+	    <delete dir="${ant-temp.dir}" failonerror="false"/>
+	    <delete dir="${class.dir}" failonerror="false"/>
+
+	    <mkdir dir="${ant-temp.dir}"/>
+	    <mkdir dir="${class.dir}"/>		
+	</target>		
+	
+	<target name="compile" depends="clean">
+	    <javac srcdir="${src.dir}" destdir="${class.dir}" debug="on" deprecation="false">
+	      <classpath refid="project.classpath"/>
+	    </javac>
+	</target>	
+	
+	<target name="make-war-file" depends="compile">
+		   <delete file="${build.dir}/${war.filename}" failonerror="false"/>
+	       <property name="war.work.dir" value="${ant-temp.dir}/war-file"/>
+	       <mkdir dir="${war.work.dir}"/>
+		   <copy todir="${war.work.dir}">
+		      <fileset dir="${war-content.dir}">
+		        <exclude name="WEB-INF/classes/**/*"/>
+		        <exclude name="WEB-INF/lib/**/*"/>
+		      </fileset>
+		   </copy>
+	       <copy todir="${war.work.dir}/WEB-INF/lib">
+	       	 <fileset dir="${lib.dir}">
+	            <include name="*.jar"/>
+	      	 </fileset>
+	      </copy>		
+	      <copy todir="${war.work.dir}/WEB-INF/classes">
+	        <fileset dir="${class.dir}">
+	          <include name="**/*.*"/>
+	        </fileset>
+	      </copy>		
+		  <jar jarfile="${build.dir}/${war.filename}" basedir="${war.work.dir}"/>
+	</target>		
+	
+</project>
